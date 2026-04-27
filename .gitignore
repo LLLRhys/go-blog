@@ -61,6 +61,7 @@ lerna-debug.log*
 .env.*.local
 
 # Sensitive data
+config.yaml
 local-config.yaml
 
 # Uploads

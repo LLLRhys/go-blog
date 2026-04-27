@@ -1,0 +1,49 @@
+name: CI/CD Deploy
+
+on: 
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Login DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_TOKEN }}
+      
+
+    - name: build main
+      run: |
+        cd ./go_blog_server
+        go mod tidy
+        go build -o main ./go_blog_server
+
+    - name: build backend image
+      run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-backend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/cicd-demo-backend:${{ github.sha }} .
+
+    - name: push backend image
+      run: |
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-backend:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-backend:${{ github.sha }}
+
+
+    - name: build dist
+      run: |
+        cd ../go_blog_web
+        npm install
+        npm run build
+
+    - name: build frontend image
+      run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:${{ github.sha }} .
+
+    - name: push frontend image
+      run: |
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:${{ github.sha }}

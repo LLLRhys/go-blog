@@ -1,0 +1,90 @@
+services:
+  redis:
+    image: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - /opt/go_blog/server/data/redis:/data
+    environment:
+      REDIS_PASSWORD: bqx-202325310401
+    command: redis-server --appendonly yes --requirepass "bqx-202325310401"
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli -a $${REDIS_PASSWORD} ping | grep -q PONG" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  mysql:
+    image: mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: bqx-202325310401
+      MYSQL_DATABASE: blog_db
+    volumes:
+      - /opt/go_blog/server/data/mysql/conf:/etc/mysql/conf.d
+      - /opt/go_blog/server/data/mysql/datadir:/var/lib/mysql
+      - /opt/go_blog/server/data/mysql/go_blog.sql:/opt/go_blog.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  elasticsearch:
+    image: elasticsearch:8.17.0
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.http.ssl.enabled=false
+      - xpack.license.self_generated.type=trial
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=bqx-202325310401
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - /opt/go_blog/server/data/es/config:/usr/share/elasticsearch/config
+      - /opt/go_blog/server/data/es/data:/usr/share/elasticsearch/data
+      - /opt/go_blog/server/data/es/plugins:/usr/share/elasticsearch/plugins
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS -u elastic:$${ELASTIC_PASSWORD} http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=2s >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+  backend:
+    build: ./server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server/uploads:/app/uploads
+      - ./server/log:/app/log
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+
+  frontend:
+    build: ./web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./web/dist:/opt/go_blog/web/dist
+      - ./server/uploads:/opt/go_blog/server/uploads
+      - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./web/nginx/conf.d/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./web/cert:/etc/nginx/cert
+    depends_on:
+      - backend
