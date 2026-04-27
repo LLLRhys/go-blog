@@ -26,7 +26,9 @@ jobs:
         go build main.go
 
     - name: build backend image
-      run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-backend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/cicd-demo-backend:${{ github.sha }} .
+      run: |
+        cd ./go_blog_server
+        docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-backend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/cicd-demo-backend:${{ github.sha }} .
 
     - name: push backend image
       run: |
@@ -36,13 +38,15 @@ jobs:
 
     - name: build dist
       run: |
-        cd ../go_blog_web
+        cd ./go_blog_web
         npm install
         npm run build
 
     - name: build frontend image
-      run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:${{ github.sha }} .
-
+      run: |
+        cd ./go_blog_web
+        docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:${{ github.sha }} .
+  
     - name: push frontend image
       run: |
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:latest
