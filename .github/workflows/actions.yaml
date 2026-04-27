@@ -28,7 +28,7 @@ jobs:
     - name: build backend image
       run: |
         cd ./go_blog_server
-        docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-backend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/cicd-demo-backend:${{ github.sha }} .
+        docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-backend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-backend:${{ github.sha }} .
 
     - name: push backend image
       run: |
