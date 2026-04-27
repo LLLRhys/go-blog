@@ -23,7 +23,7 @@ jobs:
       run: |
         cd ./go_blog_server
         go mod tidy
-        go build -o main ./go_blog_server
+        go build main.go
 
     - name: build backend image
       run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-backend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/cicd-demo-backend:${{ github.sha }} .
