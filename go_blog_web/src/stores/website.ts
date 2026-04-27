@@ -1,13 +1,13 @@
-import {defineStore} from "pinia";
-import {ref} from 'vue';
-import type {Website} from "@/api/config";
-import {websiteInfo} from "@/api/website";
+import { defineStore } from "pinia";
+import { ref } from 'vue';
+import type { Website } from "@/api/config";
+import { websiteInfo } from "@/api/website";
 
 
 function initState() {
     const websiteInfo = ref<Website>({
-        logo:'',
-        full_logo:'',
+        logo: '',
+        full_logo: '',
         title: '',
         slogan: '',
         slogan_en: '',
@@ -26,7 +26,7 @@ function initState() {
         qq_image: '',
         wechat_image: '',
     })
-    return {websiteInfo, websiteInfoInitialized: false,}
+    return { websiteInfo, websiteInfoInitialized: false, }
 }
 
 export const useWebsiteStore = defineStore('website', () => {
@@ -40,5 +40,12 @@ export const useWebsiteStore = defineStore('website', () => {
             }
         }
     }
-    return {state, initializeWebsite}
+    // 手动刷新方法，无论缓存状态如何都会重新获取数据
+    const refreshWebsite = async () => {
+        const res = await websiteInfo()
+        if (res.code === 0) {
+            state.value.websiteInfo = res.data
+        }
+    }
+    return { state, initializeWebsite, refreshWebsite }
 })
