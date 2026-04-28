@@ -82,7 +82,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./web/dist:/opt/go_blog/web/dist
+      # 前端dist目录不需要挂载了，直接copy到镜像里了
+      # - ./web/dist:/opt/go_blog/web/dist
       - ./server/uploads:/opt/go_blog/server/uploads  # 敏感数据的文件，不copy到镜像了，通过挂载卷注入
       - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./web/nginx/conf.d/nginx.conf:/etc/nginx/conf.d/nginx.conf
