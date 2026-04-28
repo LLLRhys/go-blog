@@ -23,7 +23,7 @@ jobs:
       run: |
         cd ./go_blog_server
         go mod tidy
-        go build main.go
+        go build -o main .
 
     - name: build backend image
       run: |
