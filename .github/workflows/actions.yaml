@@ -41,6 +41,7 @@ jobs:
         cd ./go_blog_web
         npm install
         npm run build
+        ls -l ./dist
 
     - name: build frontend image
       run: |
