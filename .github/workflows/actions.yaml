@@ -52,3 +52,14 @@ jobs:
       run: |
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:latest
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/go-blog-frontend:${{ github.sha }}
+
+    - name: Deploy to Tencent Cloud
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.CLOUD_HOST }}
+        port: ${{ secrets.CLOUD_PORT }}
+        username: ${{ secrets.CLOUD_USER }}
+        key: ${{ secrets.CLOUD_SSH_KEY }}
+        script: |
+          cd /opt/go_blog
+          ls -l
