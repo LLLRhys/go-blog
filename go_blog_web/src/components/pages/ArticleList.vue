@@ -125,8 +125,8 @@ const formatDate = (date: string) => {
     background: transparent;
 
     .cover {
-      width: 200px;
-      height: 140px;
+      width: 400px;
+      height: 280px;
       border-radius: 0;
     }
 
