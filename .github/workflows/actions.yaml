@@ -61,5 +61,5 @@ jobs:
         key: ${{ secrets.CLOUD_SSH_KEY }}
         script: |
           cd /opt/go_blog
-          docker compose pull
+          docker compose pull backend frontend
           docker compose up -d --remove-orphans
