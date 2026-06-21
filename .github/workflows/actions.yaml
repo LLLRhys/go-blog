@@ -61,11 +61,5 @@ jobs:
         key: ${{ secrets.CLOUD_SSH_KEY }}
         script: |
           cd /opt/go_blog
-          # 重试 3 次，解决 Docker Hub 拉取超时问题
-          export BACKEND_TAG=${{ github.sha }}
-          export FRONTEND_TAG=${{ github.sha }}
-          for i in 1 2 3; do
-            docker compose pull && break
-            [ $i -lt 3 ] && sleep 10
-          done
+          docker compose pull
           docker compose up -d --remove-orphans

@@ -20,7 +20,7 @@ func InitRouter() *gin.Engine {
 	Router.Use(middleware.GinLogger(), middleware.GinRecovery(true))
 	// 使用 Prometheus 指标采集（在业务中间件之前注册，以捕获所有请求）
 	Router.Use(middleware.PrometheusMetrics())
-	// 暴露 metrics 端点（供 Prometheus 抓取） 再次提交版
+	// 暴露 metrics 端点（供 Prometheus 抓取）
 	Router.GET("/metrics", middleware.PrometheusHandler())
 	// 使用gin会话路由
 	var store = cookie.NewStore([]byte(global.Config.System.SessionsSecret))
